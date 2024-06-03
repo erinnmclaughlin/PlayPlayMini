@@ -1,4 +1,5 @@
 ﻿using BenMakesGames.PlayPlayMini.Attributes.DI;
+using BenMakesGames.PlayPlayMini.Extensions;
 using BenMakesGames.PlayPlayMini.Model;
 using Microsoft.Extensions.Logging;
 using Microsoft.Xna.Framework;
@@ -8,8 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
-using BenMakesGames.PlayPlayMini.Extensions;
 
 namespace BenMakesGames.PlayPlayMini.Services;
 
@@ -82,10 +81,9 @@ public sealed class GraphicsManager: IServiceLoadContent, IServiceInitialize
         Pictures.Clear();
         SpriteSheets.Clear();
         Fonts.Clear();
+        PixelShaders.Clear();
 
-        // load immediately
-        foreach(var meta in gsm.Assets.GetAll<PictureMeta>().Where(m => m.PreLoaded))
-            LoadPicture(meta);
+        gsm.Assets.LoadContent(Content, Load, () => FullyLoaded = true);
 
         if(!Pictures.ContainsKey("Pixel"))
         {
@@ -94,90 +92,21 @@ public sealed class GraphicsManager: IServiceLoadContent, IServiceInitialize
 
             Pictures.Add("Pixel", whitePixel);
         }
-
-        foreach(var meta in gsm.Assets.GetAll<SpriteSheetMeta>().Where(m => m.PreLoaded))
-            LoadSpriteSheet(meta);
-
-        foreach(var meta in gsm.Assets.GetAll<FontMeta>().Where(m => m.PreLoaded))
-            LoadFont(meta);
-
-        foreach(var meta in gsm.Assets.GetAll<PixelShaderMeta>().Where(m => m.PreLoaded))
-            LoadPixelShader(meta);
-
-        // deferred
-        Task.Run(() => LoadDeferredContent(gsm.Assets));
     }
 
-    private void LoadDeferredContent(AssetCollection assets)
+    private void Load(ILoadable meta, IAsset asset)
     {
-        foreach(var meta in assets.GetAll<PictureMeta>().Where(m => !m.PreLoaded))
-            LoadPicture(meta);
+        if (asset is Texture2D picture)
+            Pictures.Add(meta.Path, picture);
 
-        foreach(var meta in assets.GetAll<SpriteSheetMeta>().Where(m => !m.PreLoaded))
-            LoadSpriteSheet(meta);
+        if (asset is SpriteSheet spriteSheet)
+            SpriteSheets.Add(meta.Path, spriteSheet);
 
-        foreach(var meta in assets.GetAll<FontMeta>().Where(m => !m.PreLoaded))
-            LoadFont(meta);
+        if (asset is Font font)
+            Fonts.Add(meta.Path, font);
 
-        foreach(var meta in assets.GetAll<PixelShaderMeta>().Where(m => !m.PreLoaded))
-            LoadPixelShader(meta);
-
-        FullyLoaded = true;
-    }
-
-    private void LoadFont(FontMeta font)
-    {
-        try
-        {
-            Fonts.Add(font.Key, new Font(
-                Content.Load<Texture2D>(font.Path),
-                font.Width,
-                font.Height,
-                font.HorizontalSpacing,
-                font.VerticalSpacing,
-                font.FirstCharacter
-            ));
-        }
-        catch (Exception e)
-        {
-            Logger.LogError("Failed to load Font (Texture2D) {Path}: {Message}", font.Path, e.Message);
-        }
-    }
-
-    private void LoadPicture(PictureMeta picture)
-    {
-        try
-        {
-            Pictures.Add(picture.Key, Content.Load<Texture2D>(picture.Path));
-        }
-        catch (Exception e)
-        {
-            Logger.LogError("Failed to load Picture (Texture2D) {Path}: {Message}", picture.Path, e.Message);
-        }
-    }
-
-    private void LoadSpriteSheet(SpriteSheetMeta spriteSheet)
-    {
-        try
-        {
-            SpriteSheets.Add(spriteSheet.Key, new SpriteSheet(Content.Load<Texture2D>(spriteSheet.Path), spriteSheet.Width, spriteSheet.Height));
-        }
-        catch (Exception e)
-        {
-            Logger.LogError("Failed to load SpriteSheet (Texture2D) {Path}: {Message}", spriteSheet.Path, e.Message);
-        }
-    }
-
-    private void LoadPixelShader(PixelShaderMeta pixelShader)
-    {
-        try
-        {
-            PixelShaders.Add(pixelShader.Key, Content.Load<Effect>(pixelShader.Path));
-        }
-        catch (Exception e)
-        {
-            Logger.LogError("Failed to load PixelShader (Effect) {Path}: {Message}", pixelShader.Path, e.Message);
-        }
+        if (asset is Effect pixelShader)
+            PixelShaders.Add(meta.Path, pixelShader);
     }
 
     public void UnloadContent()

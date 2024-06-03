@@ -131,7 +131,7 @@ public sealed class SoundManager : IServiceLoadContent
     {
     }
 
-    private void LoadDeferredContent(AssetCollection assets)
+    private void LoadDeferredContent(AssetManager assets)
     {
         foreach (var meta in assets.GetAll<SoundEffectMeta>().Where(m => !m.PreLoaded))
             LoadSoundEffect(meta);

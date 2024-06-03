@@ -2,7 +2,7 @@
 
 namespace BenMakesGames.PlayPlayMini.Model;
 
-public sealed record SpriteSheet(Texture2D Texture, int SpriteWidth, int SpriteHeight)
+public sealed record SpriteSheet(Texture2D Texture, int SpriteWidth, int SpriteHeight) : IAsset
 {
     public int Columns => Texture.Width / SpriteWidth;
     public int Rows => Texture.Height / SpriteHeight;

@@ -19,7 +19,7 @@ public class GameStateManagerBuilder
     private Type? InitialGameState { get; set; }
     private Type? LostFocusGameState { get; set; }
 
-    private AssetCollection GameAssets { get; } = new();
+    private AssetManager GameAssets { get; } = new();
 
     private Action<ContainerBuilder, IConfiguration, ServiceWatcher>? AddServicesCallback { get; set; }
     private Action<IConfigurationBuilder>? ConfigurationCallback { get; set; }

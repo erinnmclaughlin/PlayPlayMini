@@ -2,8 +2,8 @@
 
 namespace BenMakesGames.PlayPlayMini.Model;
 
-public sealed record Font(Texture2D Texture, int CharacterWidth, int CharacterHeight, int HorizontalSpacing, int VerticalSpacing, char FirstCharacter)
+public sealed record Font(Texture2D Texture, int CharacterWidth, int CharacterHeight, int HorizontalSpacing, int VerticalSpacing, char FirstCharacter) : IAsset
 {
-    public int Columns => Texture.Width / CharacterWidth;
-    public int Rows => Texture.Height / CharacterHeight;
+    public int Columns { get; } = Texture.Width / CharacterWidth;
+    public int Rows { get; } = Texture.Height / CharacterHeight;
 }

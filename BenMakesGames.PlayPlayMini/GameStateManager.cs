@@ -18,7 +18,7 @@ public sealed class GameStateManager: Game
     private GraphicsManager Graphics { get; }
     private ServiceWatcher ServiceWatcher { get; }
 
-    public AssetCollection Assets => Config.Assets;
+    public AssetManager Assets => Config.Assets;
 
     [Obsolete("Refer to Config.InitialWindowTitle instead.")] public (int Width, int Height, int Zoom) InitialWindowSize => Config.InitialWindowSize;
     [Obsolete("Refer to Config.InitialGameState instead.")] public Type InitialGameState => Config.InitialGameState;
@@ -276,5 +276,5 @@ public sealed record GameStateManagerConfig(
     Type? InitialLostFocusGameState,
     (int Width, int Height, int Zoom) InitialWindowSize,
     string InitialWindowTitle,
-    AssetCollection Assets
+    AssetManager Assets
 );
